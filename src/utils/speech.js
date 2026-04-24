@@ -107,7 +107,18 @@ export const checkSpeech = (spoken, target) => {
   const norm = s => s.toLowerCase().replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
   const sw = norm(spoken), tw = norm(target);
   if (!tw.length) return false;
-  return tw.filter(w => sw.includes(w)).length / tw.length >= 0.65;
+  if (!sw.length) return false;
+
+  // Fuzzy match: exact OR either word starts with enough of the other
+  // (catches soft/cut-off speech, e.g. "bi" → "big", "fas" → "fast")
+  const fuzzy = (t, s) => {
+    if (s === t) return true;
+    const minLen = Math.max(2, Math.ceil(Math.min(t.length, s.length) * 0.7));
+    return t.startsWith(s.slice(0, minLen)) || s.startsWith(t.slice(0, minLen));
+  };
+
+  const score = tw.filter(t => sw.some(s => fuzzy(t, s))).length / tw.length;
+  return score >= 0.5; // was 0.65 — more forgiving for soft-spoken kids
 };
 
 // ── Audio beeps ───────────────────────────────────────────────────────
