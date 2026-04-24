@@ -224,9 +224,14 @@ export default function ReadingLesson({ level, theme, players, onBack }) {
     setPhase(PHASE.START);
   };
 
-  const handleRetry = () => {
+  const handleRetry = async () => {
+    cancelRef.current = false;
     setTryCount(c => c + 1);
-    runTeachingSequence(sentence);
+    setPhase(PHASE.LISTENING);
+    const pName = players[playerIdxRef.current];
+    await speak(`Try again ${pName}!`, { rate: 0.88, pitch: 0.86 });
+    if (cancelRef.current) return;
+    startListening();
   };
 
   // ── Render helpers ───────────────────────────────────────────────────
