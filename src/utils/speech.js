@@ -68,7 +68,7 @@ export const speak = async (text, opts = {}) => {
   return _speakTTS(text, opts);
 };
 
-export const speakLetter = (letter) => speak(letter, { rate: 0.5, pitch: 0.75 });
+export const speakLetter = (letter) => speak(letter.toLowerCase(), { rate: 0.5, pitch: 0.75 });
 export const cancelSpeech = () => window.speechSynthesis.cancel();
 export const delay = (ms) => new Promise(r => setTimeout(r, ms));
 
